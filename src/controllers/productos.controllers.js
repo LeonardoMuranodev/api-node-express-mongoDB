@@ -1,4 +1,4 @@
-const Producto = require("../models/Producto")
+const {Producto} = require("../models/Producto")
 
 const obtenerProductos = async (req, res) => {
     try {
@@ -66,10 +66,60 @@ const eliminarProducto = async (req, res) => {
     }
 }
 
+// Controladores de imagenes
+const obtenerImagenesDeProducto = (req, res) => {
+    try {
+        //Recibo por middleware el producto, lo pasoa objeto para sacarle el _id
+        const producto = req.producto.toObject()
+
+        const productoImagenesMapeadas = producto.imagenes.map(img => ({
+            url: img.url,
+            descripcion: img.descripcion
+        }))
+
+        res.status(200).json(productoImagenesMapeadas)
+    } catch (error) {
+        res.status(500).json({message: `Error a la hora de obtener las imagenes de un producto: ${error.message}`})
+    }
+}
+
+const agregarImagenAProducto = (req, res) => {
+    try {
+        //Recibo por middleware el producto, lo pasoa objeto para sacarle el _id
+        const producto = req.producto
+
+        producto.imagenes.push(req.imagenValidada)
+
+        producto.save()
+
+        res.status(201).json("Imagen agregada con exito al producto")
+    } catch (error) {
+        res.status(500).json({message: `EError a la hora de agregar la imagen de un producto: ${error.message}`})
+    }
+}
+
+const eliminarImagenDeProducto = (req, res) => {
+    try {
+        const producto = req.producto
+        const {idImagen} = req.params
+
+        producto.imagenes = producto.imagenes.filter(img => img.id.toString() !== idImagen)
+
+        producto.save()
+
+        res.status(200).json("Imagen elimianda con exito del producto")
+    } catch (error) {
+        res.status(500).json({message: `Error a la hora de eliminar la imagen de un producto: ${error.message}`})
+    }
+}
+
 module.exports = {
     obtenerProductos,
     obtenerProductoPorId,
     crearProducto,
     actualizarProducto,
-    eliminarProducto
+    eliminarProducto,
+    obtenerImagenesDeProducto,
+    agregarImagenAProducto,
+    eliminarImagenDeProducto
 }

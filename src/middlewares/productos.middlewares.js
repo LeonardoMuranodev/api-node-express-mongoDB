@@ -1,5 +1,6 @@
-const Producto = require("../models/Producto")
-
+const {Producto} = require("../models/Producto")
+const mongoose = require("mongoose");
+const { imagenSchema } = require("../models/Producto");
 
 const validarIdDeProducto = async (req, res, next) => {
     try {
@@ -38,7 +39,53 @@ const validarSchemaProducto = async (req, res, next) => {
     }
 };
 
+const validarIdImagen = async (req, res, next) => {
+    try {
+        const producto = req.producto
+        const {idImagen} = req.params
+
+        console.log("id img", idImagen)
+        console.log("produc", producto)
+
+        const existeImagenId = producto.imagenes.some(img => img._id.toString() === idImagen)
+
+        if (!existeImagenId) {
+            return res.status(404).json({ message: "Imagen no encontrada para este producto"});
+        }
+
+        next();
+    } catch (error) {
+        res.status(500).json({ message: `Error a la hora de validar la imagen ${error.message}` });
+    }
+};
+
+
+
+const validarSchemaImagen = async (req, res, next) => {
+    try {
+        // 1. Usamos el esquema exportado para crear un modelo temporal.
+        // Si 'Imagen' ya existe en mongoose.models, lo usa; si no, lo crea.
+        const Imagen = mongoose.models.Imagen || mongoose.model("Imagen", imagenSchema);
+        
+        // 2. Ahora sí podemos instanciarlo porque es un modelo real
+        const nuevaImagen = new Imagen(req.body);
+        
+        // 3. Validamos
+        await nuevaImagen.validate();
+        
+        req.imagenValidada = nuevaImagen;
+        next();
+    } catch (error) {
+        return res.status(400).json({ 
+            message: "Datos de imagen inválidos", 
+            details: error.message 
+        });
+    }
+};
+
 module.exports = {
     validarIdDeProducto,
-    validarSchemaProducto
+    validarSchemaProducto,
+    validarIdImagen,
+    validarSchemaImagen
 }
