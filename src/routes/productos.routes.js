@@ -14,11 +14,12 @@ const {
 //Middlewares
 const {
     validarIdDeProducto,
+    validarSchemaProducto
 } =  require("../middlewares/productos.middlewares")
 
 router.get("/", obtenerProductos)
 router.get("/:idProducto", validarIdDeProducto, obtenerProductoPorId)
-router.post("/", crearProducto)
+router.post("/", validarSchemaProducto, crearProducto)
 router.put("/:idProducto", validarIdDeProducto, actualizarProducto)
 router.delete("/:idProducto", validarIdDeProducto, eliminarProducto)
 

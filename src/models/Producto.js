@@ -25,11 +25,6 @@ const productoSchema = new mongoose.Schema({
         type:Number,
         required: [true, "Stock es requerido"],
         min: [0, "El Stock no puede ser negativo"]
-    },
-    categoria: {
-        type:String,
-        required: [true, "Categoria es obligatoria"],
-        trim: true
     }
 }, {
     timestamp: true, // createdAt y updatedAt

@@ -26,9 +26,9 @@ const obtenerProductoPorId = (req, res) => {
 
 const crearProducto = async (req, res) => {
     try {
+        const producto = req.productoValidado
 
-        //Crea a traves de ese modelo un elemento
-        const nuevoProducto = await Producto.create(req.body) 
+        await producto.save()
 
         res.status(201).json({message: "El producto ha sido creado con exito!"})
     } catch (error) {
@@ -44,7 +44,7 @@ const actualizarProducto = async (req, res) => {
         //id a actualizar, nuevos campos, opciones extras
         await Producto.findByIdAndUpdate(_id, req.body, {
             new: true, // me devuelve el producto actualizado
-            runValidator: true // validador de schema
+            runValidators: true // validador de schema
         })
 
         res.status(200).json({message: `Producto con id: ${_id}  actualizado con exito`})
